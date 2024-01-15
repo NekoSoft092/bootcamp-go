@@ -1,0 +1,253 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+// Punto 1
+type Employ struct {
+	Name   string
+	Salary int
+}
+
+func TaxValue(employ Employ) (result float64) {
+
+	if employ.Salary > 50000 {
+		result = float64(employ.Salary) * 0.17
+		return
+	} else if employ.Salary > 150000 {
+		result = float64(employ.Salary) * 0.27
+		return
+	} else {
+		result = 0
+		return
+	}
+}
+
+// Punto 2
+func PromedioPorEstudiante(notas []int) (promedio float64, err error) {
+
+	notasLength := len(notas)
+
+	if notasLength == 0 {
+		err = errors.New("no se ha ingresado ninguna nota")
+		return
+	}
+
+	for _, value := range notas {
+		if value > 0 {
+			err = errors.New("todos los valores deben ser mayores a 0")
+			return
+		} else {
+			promedio += float64(value)
+		}
+	}
+
+	promedio = promedio / float64(notasLength)
+	return
+}
+
+// Punto 3
+type Category string
+
+const (
+	CATEGORY_C Category = "C"
+	CATEGORY_B Category = "B"
+	CATEGORY_A Category = "A"
+)
+
+type EmployPunto3 struct {
+	Name                  string
+	MinutesWorkedPerMouth float64
+	Category
+}
+
+func CalcularSalarioEmpleado(employ EmployPunto3) (salary float64) {
+	hoursWorked := employ.MinutesWorkedPerMouth / 60
+	if employ.Category == CATEGORY_C {
+		salary = hoursWorked * 1000
+		return
+	} else if employ.Category == CATEGORY_B {
+		monthBaseSalary := hoursWorked * 1500
+		salary = monthBaseSalary + (monthBaseSalary * (0.2))
+		return
+	} else {
+		monthBaseSalary := hoursWorked * 3000
+		salary = monthBaseSalary + (monthBaseSalary * (0.5))
+		return
+	}
+}
+
+// Punto 4: Calcular estadisticas
+const (
+	minimum = "minimum"
+
+	average = "average"
+
+	maximum = "maximum"
+)
+
+func operation(operationParam string) (e func(x ...int) (res float64), err error) {
+	if operationParam == minimum {
+		e = minFunc
+		return
+	} else if operationParam == maximum {
+		e = maxFunc
+		return
+	} else if operationParam == average {
+		e = averangeFunc
+		return
+	} else {
+		err = errors.ErrUnsupported
+		return
+	}
+}
+
+// Operations availables
+func minFunc(e ...int) (result float64) {
+	var min float64 = 100000000000
+	for _, value := range e {
+		if float64(value) < min {
+			min = float64(value)
+		}
+	}
+	result = min
+	return
+}
+
+func maxFunc(e ...int) (result float64) {
+	var max float64 = 0
+	for _, value := range e {
+		if float64(value) > max {
+			max = float64(value)
+		}
+	}
+	result = max
+	return
+}
+
+func averangeFunc(e ...int) (result float64) {
+	var sumatoria int = 0
+	for _, value := range e {
+		sumatoria += value
+	}
+	tam := len(e)
+	result = float64(sumatoria) / float64(tam)
+	return
+}
+
+// Punto 5
+const (
+	dog       string = "dog"
+	cat       string = "cat"
+	hamster   string = "hamster"
+	tarantula string = "tarantula"
+)
+
+func animal(animalType string) (e func(numero int) (cantidad float64), msg error) {
+	if animalType == dog {
+		e = animalDog
+		return
+	} else if animalType == cat {
+		e = animalCat
+		return
+	} else if animalType == hamster {
+		e = animalHamster
+		return
+	} else if animalType == tarantula {
+		e = animalTarantula
+		return
+	} else {
+		msg = errors.ErrUnsupported
+		return
+	}
+}
+
+func animalDog(numero int) (cantidad float64) {
+	cantidad = float64(numero) * 10 // en kg
+	return
+}
+
+func animalCat(numero int) (cantidad float64) {
+	cantidad = float64(numero) * 5 // en kg
+	return
+}
+
+func animalHamster(numero int) (cantidad float64) {
+	cantidad = float64(numero) * 250 / 1000 // en kg
+	return
+}
+
+func animalTarantula(numero int) (cantidad float64) {
+	cantidad = float64(numero) * 150 / 1000 //en kg
+	return
+}
+
+func main() {
+
+	// Punto 1: Impuestos de salario
+	myTax := Employ{
+		Name:   "Alejandro Mora",
+		Salary: 200000,
+	}
+	tax := TaxValue(myTax)
+	fmt.Println("El valor de mi impuesto es ", tax)
+
+	// Punto 2: Calcular promerdio
+	notas := []int{1, 2, 3, 4, 5, 1, 2}
+	promedio, err := PromedioPorEstudiante(notas)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println("El promedio calculado es ", promedio)
+
+	// Punto 3: Calcular salario
+	empleado := EmployPunto3{
+		Name:     "Alejandro",
+		Category: CATEGORY_A,
+	}
+	salarioEmpleado := CalcularSalarioEmpleado(empleado)
+	fmt.Printf("El salario para el empleado %v es %v", empleado.Name, salarioEmpleado)
+
+	// Punto 4: Calcular estadisticas
+	minFunc, err1 := operation(minimum)
+	averageFunc, err2 := operation(average)
+	maxFunc, err3 := operation(maximum)
+
+	if err1 != nil {
+		return
+	} else if err2 != nil {
+		return
+	} else if err3 != nil {
+		return
+	}
+
+	minValue := minFunc(2, 3, 3, 4, 10, 2, 4, 5)
+	averageValue := averageFunc(2, 3, 3, 4, 1, 2, 4, 5)
+	maxValue := maxFunc(2, 3, 3, 4, 1, 2, 4, 5)
+
+	fmt.Println("MIN", minValue)
+	fmt.Println("max", maxValue)
+	fmt.Println("averange", averageValue)
+
+	// Punto 5: Calcular cantidad de alimento
+
+	animalDog, msg1 := animal(dog)
+	animalCat, msg2 := animal(cat)
+
+	if msg1 != nil {
+		return
+	} else if msg2 != nil {
+		return
+	}
+
+	var amount float64
+	amount += animalDog(10)
+	amount += animalCat(10)
+
+	fmt.Printf("Cantidad total de alimento necesario es %v kg \n", amount)
+
+}
